@@ -1,6 +1,7 @@
 use rand::{self, Rng};
 use std::path::{Path, PathBuf};
 use mqtt::QualityOfService;
+use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct MqttOptions {
@@ -9,7 +10,7 @@ pub struct MqttOptions {
     pub clean_session: bool,
     pub client_id: Option<String>,
     pub username: Option<String>,
-    pub password: Option<String>,
+    pub password: Option<Arc<Box<Fn() -> String + Send + Sync>>>,
     pub reconnect: u16,
     pub will: Option<(String, String)>,
     pub will_qos: QualityOfService,
@@ -117,8 +118,8 @@ impl MqttOptions {
 
     /// Set `password` for broker to perform client authentication
     /// vis `username` and `password`
-    pub fn set_password(mut self, password: &str) -> Self {
-        self.password = Some(password.to_string());
+    pub fn set_password(mut self, password: Box<Fn() -> String + Send + Sync>) -> Self {
+        self.password = Some(Arc::new(password));
         self
     }
 

@@ -29,7 +29,7 @@ pub fn generate_connect_packet(opts: MqttOptions) -> Result<Vec<u8>> {
 
     // mqtt-protocol APIs are directly handling None cases.
     connect_packet.set_user_name(opts.username);
-    connect_packet.set_password(opts.password);
+    connect_packet.set_password(opts.password.map(|function| function()));
 
     let mut buf = Vec::new();
 
